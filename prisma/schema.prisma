@@ -1,0 +1,238 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  BUSINESS
+  VENDOR
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ReportStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+}
+
+enum DisputeStatus {
+  OPEN
+  REVIEWING
+  RESOLVED
+  REJECTED
+}
+
+enum SubscriptionPlan {
+  FREE
+  STARTER
+  BUSINESS
+  ENTERPRISE
+}
+
+model User {
+  id              String   @id @default(uuid())
+  fullName        String
+  email           String   @unique
+  password        String
+  role            UserRole @default(VENDOR)
+  isEmailVerified Boolean  @default(false)
+
+  emailVerificationToken   String?
+  emailVerificationExpires DateTime?
+  passwordResetToken       String?
+  passwordResetExpires     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vendor        Vendor?
+  apiKeys       ApiKey[]
+  notifications Notification[]
+  auditLogs     AuditLog[]
+  subscriptions Subscription[]
+  webhooks      Webhook[]
+}
+
+model Vendor {
+  id                 String             @id @default(uuid())
+  businessName       String
+  businessEmail      String             @unique
+  phoneNumber        String
+  address            String?
+  cacNumber          String?
+  verificationStatus VerificationStatus @default(PENDING)
+  trustScore         Float              @default(0)
+
+  ownerId String @unique
+  owner   User   @relation(fields: [ownerId], references: [id])
+
+  documents    Document[]
+  reviews      Review[]
+  reports      ScamReport[]
+  transactions Transaction[]
+  disputes     Dispute[]
+  trustHistory TrustScoreHistory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Document {
+  id           String             @id @default(uuid())
+  fileUrl      String
+  fileType     String
+  verification VerificationStatus @default(PENDING)
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id      String  @id @default(uuid())
+  rating  Int
+  comment String?
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model ScamReport {
+  id          String       @id @default(uuid())
+  title       String
+  description String
+  status      ReportStatus @default(OPEN)
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Transaction {
+  id     String @id @default(uuid())
+  amount Float
+  status String
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Dispute {
+  id          String        @id @default(uuid())
+  title       String
+  description String
+  status      DisputeStatus @default(OPEN)
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model TrustScoreHistory {
+  id       String @id @default(uuid())
+  oldScore Float
+  newScore Float
+  reason   String
+
+  vendorId String
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model ApiKey {
+  id   String @id @default(uuid())
+  key  String @unique
+  name String
+
+  requestsCount Int       @default(0)
+  lastUsedAt    DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  usageLogs ApiUsageLog[]
+
+  createdAt DateTime @default(now())
+}
+
+model ApiUsageLog {
+  id String @id @default(uuid())
+
+  endpoint   String
+  method     String
+  statusCode Int
+  ipAddress  String?
+
+  apiKeyId String
+  apiKey   ApiKey @relation(fields: [apiKeyId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id      String  @id @default(uuid())
+  title   String
+  message String
+  isRead  Boolean @default(false)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model AuditLog {
+  id        String  @id @default(uuid())
+  action    String
+  ipAddress String?
+  userAgent String?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Subscription {
+  id       String           @id @default(uuid())
+  plan     SubscriptionPlan @default(FREE)
+  startsAt DateTime
+  endsAt   DateTime
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model Webhook {
+  id        String   @id @default(uuid())
+  url       String
+  event     String
+  isActive  Boolean  @default(true)
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

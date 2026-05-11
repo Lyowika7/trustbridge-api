@@ -1,0 +1,6 @@
+export const PLAN_LIMITS = {
+  FREE: 100,
+  STARTER: 5000,
+  BUSINESS: 50000,
+  ENTERPRISE: Infinity
+};
