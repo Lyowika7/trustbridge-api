@@ -42,7 +42,11 @@ jobs:
     env:
       DATABASE_URL: postgresql://postgres:password@localhost:5432/trustbridge_test_db
       REDIS_URL: redis://localhost:6379
-      JWT_SECRET: testsecret
+      JWT_ACCESS_SECRET: test_access_secret
+      JWT_REFRESH_SECRET: test_refresh_secret
+      JWT_ACCESS_EXPIRES_IN: 15m
+      JWT_REFRESH_EXPIRES_IN: 7d
+      CLIENT_URL: http://localhost:5173
       NODE_ENV: test
 
     steps:
@@ -62,6 +66,22 @@ jobs:
 
       - name: Run migrations
         run: npx prisma migrate deploy
+
+      - name: Start API server
+        run: npm start &
+        env:
+          NODE_ENV: test
+          PORT: 5000
+          DATABASE_URL: postgresql://postgres:password@localhost:5432/trustbridge_test_db
+          REDIS_URL: redis://localhost:6379
+          JWT_ACCESS_SECRET: test_access_secret
+          JWT_REFRESH_SECRET: test_refresh_secret
+          JWT_ACCESS_EXPIRES_IN: 15m
+          JWT_REFRESH_EXPIRES_IN: 7d
+          CLIENT_URL: http://localhost:5173
+
+      - name: Wait for API
+        run: npx wait-on http://localhost:5000/api/health
 
       - name: Run tests
         run: npm test
