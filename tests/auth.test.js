@@ -1,5 +1,4 @@
 const testEmail = `testuser_${Date.now()}@example.com`;
-let accessToken;
 
 describe("Auth Flow", () => {
   it("should register a new user", async () => {
@@ -39,7 +38,7 @@ describe("Auth Flow", () => {
     expect(body.success).toBe(true);
   });
 
-  it("should not login before email verification", async () => {
+  it("should block login before email verification", async () => {
     const res = await fetch("http://localhost:5000/api/auth/login", {
       method: "POST",
       headers: {
@@ -55,12 +54,5 @@ describe("Auth Flow", () => {
 
     expect(res.status).toBe(500);
     expect(body.success).toBe(false);
-  });
-
-  it("should login after manual email verification", async () => {
-    // This test needs the user to be manually verified in the DB.
-    // Since our API no longer exposes verificationToken, this route cannot verify directly.
-    // For now, this test is skipped until we add a test-only verification helper.
-    expect(true).toBe(true);
   });
 });
