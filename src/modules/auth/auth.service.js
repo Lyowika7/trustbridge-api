@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import prisma from "../../config/prisma.js";
+import sendEmail from "../../utils/sendEmail.js";
+
 import {
   generateAccessToken,
   generateRefreshToken
@@ -15,6 +17,19 @@ const createVerificationToken = () => {
     .digest("hex");
 
   return { rawToken, hashedToken };
+};
+
+const getSafeUser = (user) => {
+  const {
+    password,
+    emailVerificationToken,
+    emailVerificationExpires,
+    passwordResetToken,
+    passwordResetExpires,
+    ...safeUser
+  } = user;
+
+  return safeUser;
 };
 
 export const registerUserService = async (data) => {
@@ -39,18 +54,25 @@ export const registerUserService = async (data) => {
     }
   });
 
-  const {
-    password,
-    emailVerificationToken,
-    emailVerificationExpires,
-    passwordResetToken,
-    passwordResetExpires,
-    ...safeUser
-  } = user;
+  const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${rawToken}`;
+
+  await sendEmail({
+    to: user.email,
+    subject: "Verify your TrustBridge email",
+    html: `
+      <h2>Welcome to TrustBridge</h2>
+      <p>Hello ${user.fullName},</p>
+      <p>Please verify your email by clicking the button below:</p>
+      <a href="${verificationUrl}" style="background:#020617;color:#fff;padding:12px 18px;text-decoration:none;border-radius:8px;display:inline-block;">
+        Verify Email
+      </a>
+      <p>This link expires in 15 minutes.</p>
+    `
+  });
 
   return {
-    user: safeUser,
-    verificationToken: rawToken
+    user: getSafeUser(user),
+    message: "Verification email sent successfully"
   };
 };
 
@@ -82,7 +104,7 @@ export const verifyEmailService = async (token) => {
     }
   });
 
-  return updatedUser;
+  return getSafeUser(updatedUser);
 };
 
 export const resendVerificationService = async (email) => {
@@ -108,8 +130,24 @@ export const resendVerificationService = async (email) => {
     }
   });
 
+  const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${rawToken}`;
+
+  await sendEmail({
+    to: user.email,
+    subject: "Resend: Verify your TrustBridge email",
+    html: `
+      <h2>Verify your TrustBridge email</h2>
+      <p>Hello ${user.fullName},</p>
+      <p>Click below to verify your email:</p>
+      <a href="${verificationUrl}" style="background:#020617;color:#fff;padding:12px 18px;text-decoration:none;border-radius:8px;display:inline-block;">
+        Verify Email
+      </a>
+      <p>This link expires in 15 minutes.</p>
+    `
+  });
+
   return {
-    verificationToken: rawToken
+    message: "Verification email resent successfully"
   };
 };
 
@@ -141,20 +179,9 @@ export const loginUserService = async (data) => {
     id: user.id
   });
 
-  const {
-    password,
-    emailVerificationToken,
-    emailVerificationExpires,
-    passwordResetToken,
-    passwordResetExpires,
-    ...safeUser
-  } = user;
-
-
   return {
-    user: safeUser,
+    user: getSafeUser(user),
     accessToken,
     refreshToken
   };
-  
 };
