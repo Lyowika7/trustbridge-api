@@ -1,6 +1,15 @@
 import nodemailer from "nodemailer";
 
 const sendEmail = async ({ to, subject, html }) => {
+  if (process.env.NODE_ENV === "test") {
+    return {
+      messageId: "test-email-skipped",
+      to,
+      subject,
+      html
+    };
+  }
+
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number(process.env.SMTP_PORT),
@@ -13,7 +22,7 @@ const sendEmail = async ({ to, subject, html }) => {
     }
   });
 
-  await transporter.sendMail({
+  return transporter.sendMail({
     from: process.env.SMTP_FROM,
     to,
     subject,
