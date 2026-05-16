@@ -1,23 +1,30 @@
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 587,
-  secure: false,
-  requireTLS: true,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
-  }
-});
+import axios from "axios";
 
 const sendEmail = async ({ to, subject, html }) => {
-  return transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
-    subject,
-    html
-  });
+  if (process.env.NODE_ENV === "test") {
+    return { messageId: "test-email-skipped" };
+  }
+
+  const response = await axios.post(
+    "https://api.brevo.com/v3/smtp/email",
+    {
+      sender: {
+        name: "TrustBridge",
+        email: process.env.BREVO_SENDER_EMAIL
+      },
+      to: [{ email: to }],
+      subject,
+      htmlContent: html
+    },
+    {
+      headers: {
+        "api-key": process.env.BREVO_API_KEY,
+        "Content-Type": "application/json"
+      }
+    }
+  );
+
+  return response.data;
 };
 
 export default sendEmail;
