@@ -16,12 +16,11 @@ import { createAuditLogService } from "../admin/audit.service.js";
 
 export const register = async (req, res, next) => {
   try {
-    const validatedData = registerSchema.parse(req.body);
-    const result = await registerUserService(validatedData);
+    const result = await registerUserService(req.body);
 
     res.status(201).json({
       success: true,
-      message: "User registered successfully. Please verify your email.",
+      message: "Registration successful. Please check your email to verify your account.",
       data: result
     });
   } catch (error) {

@@ -41,6 +41,13 @@ export const registerUserService = async (data) => {
     throw new Error("Email already exists");
   }
 
+  const allowedRoles = ["ADMIN", "VENDOR"];
+  const selectedRole = data.role?.toUpperCase() || "VENDOR";
+
+  if (!allowedRoles.includes(selectedRole)) {
+    throw new Error("Invalid role selected");
+  }
+
   const hashedPassword = await bcrypt.hash(data.password, 12);
   const { rawToken, hashedToken } = createVerificationToken();
 
@@ -49,7 +56,7 @@ export const registerUserService = async (data) => {
       fullName: data.fullName,
       email: data.email,
       password: hashedPassword,
-      role: data.role?.toUpperCase() || "VENDOR",
+      role: selectedRole,
       emailVerificationToken: hashedToken,
       emailVerificationExpires: new Date(Date.now() + 15 * 60 * 1000)
     }
@@ -57,28 +64,23 @@ export const registerUserService = async (data) => {
 
   const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${rawToken}`;
 
-  try {
-    await sendEmail({
-      to: user.email,
-      subject: "Verify your TrustBridge email",
-      html: `
-        <h2>Welcome to TrustBridge</h2>
-        <p>Hello ${user.fullName},</p>
-        <p>Please verify your email by clicking the button below:</p>
-        <a href="${verificationUrl}" style="background:#020617;color:#fff;padding:12px 18px;text-decoration:none;border-radius:8px;display:inline-block;">
-          Verify Email
-        </a>
-        <p>This link expires in 15 minutes.</p>
-      `
-    });
-  } catch (error) {
-    console.error("Email sending failed:", error.message);
-  }
+  await sendEmail({
+    to: user.email,
+    subject: "Verify your TrustBridge email",
+    html: `
+      <h2>Welcome to TrustBridge</h2>
+      <p>Hello ${user.fullName},</p>
+      <p>Please verify your email by clicking the button below:</p>
+      <a href="${verificationUrl}" style="background:#020617;color:#fff;padding:12px 18px;text-decoration:none;border-radius:8px;display:inline-block;">
+        Verify Email
+      </a>
+      <p>This link expires in 15 minutes.</p>
+    `
+  });
 
   return {
     user: getSafeUser(user),
-    verificationToken: rawToken,
-    message: "User registered successfully. Please check your email for verification."
+    message: "Verification email sent successfully"
   };
 };
 
@@ -138,27 +140,22 @@ export const resendVerificationService = async (email) => {
 
   const verificationUrl = `${process.env.CLIENT_URL}/verify-email?token=${rawToken}`;
 
-  try {
-    await sendEmail({
-      to: user.email,
-      subject: "Resend: Verify your TrustBridge email",
-      html: `
-        <h2>Verify your TrustBridge email</h2>
-        <p>Hello ${user.fullName},</p>
-        <p>Click below to verify your email:</p>
-        <a href="${verificationUrl}" style="background:#020617;color:#fff;padding:12px 18px;text-decoration:none;border-radius:8px;display:inline-block;">
-          Verify Email
-        </a>
-        <p>This link expires in 15 minutes.</p>
-      `
-    });
-  } catch (error) {
-    console.error("Email sending failed:", error.message);
-  }
+  await sendEmail({
+    to: user.email,
+    subject: "Resend: Verify your TrustBridge email",
+    html: `
+      <h2>Verify your TrustBridge email</h2>
+      <p>Hello ${user.fullName},</p>
+      <p>Click below to verify your email:</p>
+      <a href="${verificationUrl}" style="background:#020617;color:#fff;padding:12px 18px;text-decoration:none;border-radius:8px;display:inline-block;">
+        Verify Email
+      </a>
+      <p>This link expires in 15 minutes.</p>
+    `
+  });
 
   return {
-    verificationToken: rawToken,
-    message: "Verification email request processed."
+    message: "Verification email resent successfully"
   };
 };
 
