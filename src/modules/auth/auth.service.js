@@ -81,9 +81,13 @@ export const registerUserService = async (data) => {
   return {
     user: getSafeUser(user),
     message: "Verification email sent successfully",
-    ...(process.env.SKIP_EMAIL === "true" && {
+    ...(
+      process.env.SKIP_EMAIL === "true" ||
+      process.env.NODE_ENV === "test" ||
+      process.env.GITHUB_ACTIONS === "true"
+    ) && {
       verificationToken: rawToken
-    })
+    }
   };
 };
 

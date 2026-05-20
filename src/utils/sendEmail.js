@@ -3,7 +3,8 @@ import axios from "axios";
 const sendEmail = async ({ to, subject, html }) => {
   if (
     process.env.NODE_ENV === "test" ||
-    process.env.SKIP_EMAIL === "true"
+    process.env.SKIP_EMAIL === "true" ||
+    process.env.GITHUB_ACTIONS === "true"
   ) {
     console.log(`Email skipped: ${to} - ${subject}`);
     return { messageId: "test-email-skipped" };
