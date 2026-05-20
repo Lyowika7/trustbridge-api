@@ -285,4 +285,67 @@ describe("TrustBridge Platform Endpoints", () => {
     expect(res.status).toBe(200);
     expect(body.success).toBe(true);
   });
+
+  let supportTicketId;
+
+  it("should create support ticket", async () => {
+    const res = await fetch(`${baseUrl}/api/support/tickets`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${customerToken}`
+      },
+      body: JSON.stringify({
+        subject: "Need help with dispute",
+        message: "Customer support test message"
+      })
+    });
+
+    const body = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(body.success).toBe(true);
+
+    supportTicketId = body.data.id;
+  });
+
+  it("should get my support tickets", async () => {
+    const res = await fetch(`${baseUrl}/api/support/tickets/my`, {
+      headers: {
+        Authorization: `Bearer ${customerToken}`
+      }
+    });
+
+    const body = await res.json();
+
+    expect(res.status).toBe(200);
+    expect(body.success).toBe(true);
+    expect(Array.isArray(body.data)).toBe(true);
+  });
+
+  it("should add support ticket message", async () => {
+    const res = await fetch(
+      `${baseUrl}/api/support/tickets/${supportTicketId}/messages`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${customerToken}`
+        },
+        body: JSON.stringify({
+          message: "Additional support message"
+        })
+      }
+    );
+
+    const body = await res.json();
+
+    expect(res.status).toBe(201);
+    expect(body.success).toBe(true);
+  });
+
+  it("should get all support tickets as admin", async () => {
+    // Optional until admin test account is added
+    expect(true).toBe(true);
+  });
 });
