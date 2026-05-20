@@ -8,9 +8,9 @@ datasource db {
 }
 
 enum UserRole {
-  ADMIN
-  BUSINESS
+  CUSTOMER
   VENDOR
+  ADMIN
 }
 
 enum VerificationStatus {
@@ -62,30 +62,73 @@ model User {
   auditLogs     AuditLog[]
   subscriptions Subscription[]
   webhooks      Webhook[]
+
+  supportTickets        SupportTicket[]
+  supportTicketMessages SupportTicketMessage[]
 }
 
 model Vendor {
-  id                 String             @id @default(uuid())
-  businessName       String
-  businessEmail      String             @unique
-  phoneNumber        String
-  address            String?
-  cacNumber          String?
-  verificationStatus VerificationStatus @default(PENDING)
-  trustScore         Float              @default(0)
+  id                    String                @id @default(uuid())
+  businessName          String
+  businessEmail         String                @unique
+  phoneNumber           String
+  address               String?
+  cacNumber             String?
+  nin                   String?
+  category              String?
+  description           String?
+  verificationStatus    VerificationStatus    @default(PENDING)
+  trustScore            Float                 @default(0)
 
-  ownerId String @unique
-  owner   User   @relation(fields: [ownerId], references: [id])
+  ownerId               String                @unique
+  owner                 User                  @relation(fields: [ownerId], references: [id])
 
-  documents    Document[]
-  reviews      Review[]
-  reports      ScamReport[]
-  transactions Transaction[]
-  disputes     Dispute[]
-  trustHistory TrustScoreHistory[]
+  documents             Document[]
+  reviews               Review[]
+  reports               ScamReport[]
+  transactions          Transaction[]
+  disputes              Dispute[]
+  trustHistory          TrustScoreHistory[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+}
+
+enum SupportTicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+}
+
+model SupportTicket {
+  id          String              @id @default(uuid())
+  subject     String
+  message     String
+  status      SupportTicketStatus @default(OPEN)
+
+  userId      String
+  user        User                @relation(fields: [userId], references: [id])
+
+  disputeId   String?
+  dispute     Dispute?            @relation(fields: [disputeId], references: [id])
+
+  messages    SupportTicketMessage[]
+
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+}
+
+model SupportTicketMessage {
+  id          String          @id @default(uuid())
+  message     String
+
+  ticketId    String
+  ticket      SupportTicket   @relation(fields: [ticketId], references: [id])
+
+  senderId    String
+  sender      User            @relation(fields: [senderId], references: [id])
+
+  createdAt   DateTime        @default(now())
 }
 
 model Document {
@@ -144,6 +187,8 @@ model Dispute {
   vendor   Vendor @relation(fields: [vendorId], references: [id])
 
   createdAt DateTime @default(now())
+
+  supportTickets SupportTicket[]
 }
 
 model TrustScoreHistory {

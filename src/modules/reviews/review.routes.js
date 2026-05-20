@@ -15,21 +15,21 @@ const router = express.Router();
 router.post(
   "/",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("CUSTOMER", "ADMIN"),
   createReview
 );
 
 router.get(
   "/vendor/:vendorId",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("CUSTOMER", "VENDOR", "ADMIN"),
   getVendorReviews
 );
 
 router.patch(
   "/:id",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("CUSTOMER", "ADMIN"),
   updateReview
 );
 

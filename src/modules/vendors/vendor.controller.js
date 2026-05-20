@@ -3,7 +3,11 @@ import {
   getAllVendorsService,
   getVendorByIdService,
   updateVendorService,
-  deleteVendorService
+  deleteVendorService,
+  getMyVendorService,
+  updateMyVendorService,
+  getTopRatedVendorsService,
+  searchVendorsService
 } from "./vendor.service.js";
 
 import {
@@ -17,7 +21,6 @@ export const createVendor = async (req, res, next) => {
   try {
     const validatedData = createVendorSchema.parse(req.body);
     const vendor = await createVendorService(req.user.id, validatedData);
-
 
     res.status(201).json({
       success: true,
@@ -61,9 +64,11 @@ export const getVendorById = async (req, res, next) => {
 
 export const updateVendor = async (req, res, next) => {
   try {
+    const validatedData = updateVendorSchema.parse(req.body);
+
     const vendor = await updateVendorService(
       req.params.id,
-      updateVendorSchema.parse(req.body),
+      validatedData,
       req.user.id
     );
 
@@ -84,6 +89,64 @@ export const deleteVendor = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Vendor deleted successfully"
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMyVendor = async (req, res, next) => {
+  try {
+    const vendor = await getMyVendorService(req.user.id);
+
+    res.status(200).json({
+      success: true,
+      data: vendor
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateMyVendor = async (req, res, next) => {
+  try {
+    const validatedData = updateVendorSchema.parse(req.body);
+
+    const vendor = await updateMyVendorService(
+      req.user.id,
+      validatedData
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Vendor profile updated successfully",
+      data: vendor
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getTopRatedVendors = async (req, res, next) => {
+  try {
+    const vendors = await getTopRatedVendorsService();
+
+    res.status(200).json({
+      success: true,
+      data: vendors
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const searchVendors = async (req, res, next) => {
+  try {
+    const vendors = await searchVendorsService(req.query.query || "");
+
+    res.status(200).json({
+      success: true,
+      data: vendors
     });
   } catch (error) {
     next(error);

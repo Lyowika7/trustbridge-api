@@ -15,14 +15,14 @@ const router = express.Router();
 router.post(
   "/upload",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("VENDOR", "ADMIN"),
   uploadDocument
 );
 
 router.get(
   "/vendor/:vendorId",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("VENDOR", "ADMIN"),
   getVendorDocuments
 );
 

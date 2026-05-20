@@ -1,11 +1,9 @@
 import prisma from "../../config/prisma.js";
-import { getCache, setCache, deleteCache } from "../../utils/cache.js";
+import { getCache, setCache } from "../../utils/cache.js";
 
 export const createVendorService = async (userId, data) => {
   const existingVendor = await prisma.vendor.findUnique({
-    where: {
-      businessEmail: data.businessEmail
-    }
+    where: { businessEmail: data.businessEmail }
   });
 
   if (existingVendor) {
@@ -13,27 +11,21 @@ export const createVendorService = async (userId, data) => {
   }
 
   const existingOwnerVendor = await prisma.vendor.findUnique({
-    where: {
-      ownerId: userId
-    }
+    where: { ownerId: userId }
   });
 
   if (existingOwnerVendor) {
     throw new Error("This user already owns a vendor profile");
   }
 
-  const vendor = await prisma.vendor.create({
+  return prisma.vendor.create({
     data: {
-      businessName: data.businessName,
-      businessEmail: data.businessEmail,
-      phoneNumber: data.phoneNumber,
-      address: data.address,
-      cacNumber: data.cacNumber,
-      ownerId: userId
+      ...data,
+      owner: {
+        connect: { id: userId }
+      }
     }
   });
-
-  return vendor;
 };
 
 export const getAllVendorsService = async ({
@@ -42,14 +34,10 @@ export const getAllVendorsService = async ({
   search = ""
 }) => {
   const cacheKey = `vendors:page=${page}:limit=${limit}:search=${search}`;
-
   const cachedVendors = await getCache(cacheKey);
 
   if (cachedVendors) {
-    return {
-      ...cachedVendors,
-      source: "cache"
-    };
+    return { ...cachedVendors, source: "cache" };
   }
 
   const skip = (Number(page) - 1) * Number(limit);
@@ -67,6 +55,12 @@ export const getAllVendorsService = async ({
           contains: search,
           mode: "insensitive"
         }
+      },
+      {
+        category: {
+          contains: search,
+          mode: "insensitive"
+        }
       }
     ]
   };
@@ -75,9 +69,7 @@ export const getAllVendorsService = async ({
     where,
     skip,
     take: Number(limit),
-    orderBy: {
-      createdAt: "desc"
-    }
+    orderBy: { createdAt: "desc" }
   });
 
   const total = await prisma.vendor.count({ where });
@@ -100,7 +92,13 @@ export const getAllVendorsService = async ({
 
 export const getVendorByIdService = async (id) => {
   const vendor = await prisma.vendor.findUnique({
-    where: { id }
+    where: { id },
+    include: {
+      reviews: true,
+      reports: true,
+      disputes: true,
+      documents: true
+    }
   });
 
   if (!vendor) {
@@ -147,4 +145,72 @@ export const deleteVendorService = async (id, userId) => {
   });
 
   return true;
+};
+
+export const getMyVendorService = async (userId) => {
+  const vendor = await prisma.vendor.findUnique({
+    where: { ownerId: userId },
+    include: {
+      reviews: true,
+      reports: true,
+      disputes: true,
+      documents: true
+    }
+  });
+
+  if (!vendor) {
+    throw new Error("Vendor profile not found");
+  }
+
+  return vendor;
+};
+
+export const updateMyVendorService = async (userId, data) => {
+  const vendor = await prisma.vendor.findUnique({
+    where: { ownerId: userId }
+  });
+
+  if (!vendor) {
+    throw new Error("Vendor profile not found");
+  }
+
+  return prisma.vendor.update({
+    where: { ownerId: userId },
+    data
+  });
+};
+
+export const getTopRatedVendorsService = async () => {
+  return prisma.vendor.findMany({
+    orderBy: { trustScore: "desc" },
+    take: 10
+  });
+};
+
+export const searchVendorsService = async (query = "") => {
+  return prisma.vendor.findMany({
+    where: {
+      OR: [
+        {
+          businessName: {
+            contains: query,
+            mode: "insensitive"
+          }
+        },
+        {
+          businessEmail: {
+            contains: query,
+            mode: "insensitive"
+          }
+        },
+        {
+          category: {
+            contains: query,
+            mode: "insensitive"
+          }
+        }
+      ]
+    },
+    orderBy: { trustScore: "desc" }
+  });
 };

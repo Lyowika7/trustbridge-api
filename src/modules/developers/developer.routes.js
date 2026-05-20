@@ -12,7 +12,7 @@ import {
 const router = express.Router();
 
 router.use(protect);
-router.use(authorize("BUSINESS", "ADMIN"));
+router.use(authorize("VENDOR", "ADMIN"));
 
 router.post("/api-keys", createApiKey);
 router.get("/api-keys", getApiKeys);

@@ -41,10 +41,10 @@ export const registerUserService = async (data) => {
     throw new Error("Email already exists");
   }
 
-  const allowedRoles = ["ADMIN", "VENDOR"];
-  const selectedRole = data.role?.toUpperCase() || "VENDOR";
+  const allowedPublicRoles = ["CUSTOMER", "VENDOR"];
+  const selectedRole = data.role?.toUpperCase() || "CUSTOMER";
 
-  if (!allowedRoles.includes(selectedRole)) {
+  if (!allowedPublicRoles.includes(selectedRole)) {
     throw new Error("Invalid role selected");
   }
 
@@ -80,7 +80,10 @@ export const registerUserService = async (data) => {
 
   return {
     user: getSafeUser(user),
-    message: "Verification email sent successfully"
+    message: "Verification email sent successfully",
+    ...(process.env.SKIP_EMAIL === "true" && {
+      verificationToken: rawToken
+    })
   };
 };
 

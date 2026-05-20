@@ -15,28 +15,28 @@ const router = express.Router();
 router.post(
   "/",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("VENDOR", "ADMIN"),
   createTransaction
 );
 
 router.get(
   "/vendor/:vendorId",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("VENDOR", "ADMIN"),
   getVendorTransactions
 );
 
 router.get(
   "/:id",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("VENDOR", "ADMIN"),
   getTransactionById
 );
 
 router.patch(
   "/:id/status",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("VENDOR", "ADMIN"),
   updateTransactionStatus
 );
 

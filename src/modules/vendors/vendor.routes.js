@@ -10,43 +10,67 @@ import {
   getVendorById,
   updateVendor,
   deleteVendor,
-  getVendorTrustScore
+  getVendorTrustScore,
+  getMyVendor,
+  updateMyVendor,
+  getTopRatedVendors,
+  searchVendors
 } from "./vendor.controller.js";
 
 const router = express.Router();
 
+router.get("/top-rated", getTopRatedVendors);
+router.get("/search", searchVendors);
+
+router.get(
+  "/me",
+  protect,
+  authorize("VENDOR", "ADMIN"),
+  getMyVendor
+);
+
+router.patch(
+  "/me",
+  protect,
+  authorize("VENDOR", "ADMIN"),
+  updateMyVendor
+);
+
 router.post(
   "/",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("VENDOR", "ADMIN"),
   createVendor
 );
 
 router.get(
   "/",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("CUSTOMER", "VENDOR", "ADMIN"),
   getAllVendors
 );
+
+router.get("/top-rated", getTopRatedVendors);
+router.get("/search", searchVendors);
 
 router.get(
   "/:id",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("CUSTOMER", "VENDOR", "ADMIN"),
   getVendorById
 );
 
 router.patch(
   "/:id",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("VENDOR", "ADMIN"),
   updateVendor
 );
 
 router.delete(
   "/:id",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("VENDOR", "ADMIN"),
   deleteVendor
 );
 

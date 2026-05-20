@@ -16,21 +16,21 @@ const router = express.Router();
 router.post(
   "/",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("CUSTOMER", "ADMIN"),
   createDispute
 );
 
 router.get(
   "/",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("CUSTOMER", "VENDOR", "ADMIN"),
   getAllDisputes
 );
 
 router.get(
   "/:id",
   protect,
-  authorize("BUSINESS", "ADMIN"),
+  authorize("CUSTOMER", "VENDOR", "ADMIN"),
   getDisputeById
 );
 

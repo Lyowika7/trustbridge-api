@@ -5,7 +5,10 @@ export const createVendorSchema = z.object({
   businessEmail: z.string().email(),
   phoneNumber: z.string().min(7),
   address: z.string().optional(),
-  cacNumber: z.string().optional()
+  cacNumber: z.string().optional(),
+  nin: z.string().optional(),
+  category: z.string().optional(),
+  description: z.string().optional()
 });
 
 export const updateVendorSchema = z.object({
@@ -13,5 +16,8 @@ export const updateVendorSchema = z.object({
   businessEmail: z.string().email().optional(),
   phoneNumber: z.string().min(7).optional(),
   address: z.string().optional(),
-  cacNumber: z.string().optional()
+  cacNumber: z.string().optional(),
+  nin: z.string().optional(),
+  category: z.string().optional(),
+  description: z.string().optional()
 });
