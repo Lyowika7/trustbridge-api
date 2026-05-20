@@ -1,5 +1,7 @@
 import prisma from "../../config/prisma.js";
 
+import { getIO } from "../../config/socket.js";
+
 export const createNotificationService = async (data) => {
   const user = await prisma.user.findUnique({
     where: { id: data.userId }
@@ -9,13 +11,29 @@ export const createNotificationService = async (data) => {
     throw new Error("User not found");
   }
 
-  return prisma.notification.create({
+  const notification = await prisma.notification.create({
     data: {
       title: data.title,
       message: data.message,
       userId: data.userId
     }
   });
+
+  try {
+    const io = getIO();
+
+    io.to(data.userId).emit("notification:new", {
+      id: notification.id,
+      title: notification.title,
+      message: notification.message,
+      isRead: notification.isRead,
+      createdAt: notification.createdAt
+    });
+  } catch (error) {
+    console.error("Socket notification error:", error.message);
+  }
+
+  return notification;
 };
 
 export const getMyNotificationsService = async (userId) => {

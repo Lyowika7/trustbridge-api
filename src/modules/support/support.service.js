@@ -1,5 +1,7 @@
 import prisma from "../../config/prisma.js";
 
+import { getIO } from "../../config/socket.js";
+
 const allowedStatuses = ["OPEN", "IN_PROGRESS", "RESOLVED"];
 
 export const createSupportTicketService = async (userId, data) => {
@@ -81,18 +83,34 @@ export const addSupportTicketMessageService = async (
   message
 ) => {
   const ticket = await prisma.supportTicket.findUnique({
-    where: { id: ticketId }
+    where: { id: ticketId },
+    include: {
+      user: true
+    }
   });
 
   if (!ticket) {
     throw new Error("Support ticket not found");
   }
 
-  return prisma.supportTicketMessage.create({
+  const newMessage = await prisma.supportTicketMessage.create({
     data: {
       ticketId,
       senderId,
       message
     }
   });
+
+  try {
+    const io = getIO();
+
+    io.to(ticket.userId).emit("support:message", {
+      ticketId,
+      message: newMessage
+    });
+  } catch (error) {
+    console.error("Socket support message error:", error.message);
+  }
+
+  return newMessage;
 };
