@@ -15,6 +15,7 @@ import documentRoutes from "./modules/documents/document.routes.js";
 import notificationRoutes from "./modules/notifications/notification.routes.js";
 import webhookRoutes from "./modules/webhooks/webhook.routes.js"; 
 import supportRoutes from "./modules/support/support.routes.js";   
+import swaggerSetup from "./config/swagger.js";
 import notFoundMiddleware from "./middlewares/notFound.middleware.js"; 
 import errorMiddleware from "./middlewares/error.middleware.js";
 import authRoutes from "./modules/auth/auth.routes.js";
@@ -58,6 +59,9 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/webhooks", webhookRoutes);
 app.use("/api/support", supportRoutes);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+swaggerSetup(app);
+
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 

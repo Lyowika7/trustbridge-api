@@ -1,649 +1,322 @@
-````md
 # TrustBridge API
 
-## Production-Ready Vendor Verification, Trust Scoring & Fraud Infrastructure Platform
+Production-ready vendor trust, verification, fraud reporting, dispute management, support, and reputation infrastructure API.
 
-TrustBridge API is a production-ready backend infrastructure platform designed for vendor verification, trust scoring, fraud reporting, dispute management, transaction monitoring, and reputation tracking.
+## Live Links
 
-Built for:
-- Fintech platforms
-- Ecommerce systems
-- Digital marketplaces
-- Logistics companies
-- Procurement systems
-- Vendor management platforms
-- Fraud detection systems
+Production API:
 
-TrustBridge helps businesses automate trust, reputation, verification, and fraud infrastructure through a scalable REST API architecture.
-
----
-
-# Live Deployment
-
-## Production API
 ```txt
 https://trustbridge-api-h36q.onrender.com
-````
 
-## Swagger Documentation
+Swagger Docs:
 
-```txt
 https://trustbridge-api-h36q.onrender.com/api/docs
-```
 
-## Health Check
+Health Check:
 
-```txt
 https://trustbridge-api-h36q.onrender.com/api/health
-```
+Overview
 
----
+TrustBridge is a SaaS-grade backend platform for managing trust between customers, vendors, and platform admins.
 
-# Features
+It supports:
 
-## Authentication & Authorization
+Customer accounts
+Vendor business profiles
+Admin moderation
+Vendor discovery
+Vendor trust scoring
+Reviews and ratings
+Scam/fraud reports
+Disputes
+Support/customer-care tickets
+Real-time notifications
+Webhooks
+API keys
+Billing/subscriptions
+Audit logs
+Redis caching
+BullMQ background jobs
+CI/CD testing
+Roles
+CUSTOMER
 
-* JWT Authentication
-* Access Tokens
-* Refresh Tokens
-* Role-Based Access Control (RBAC)
-* Protected Routes
-* API Key Authentication
+Customers can:
 
-## Vendor Management
+Search vendors
+View top-rated vendors
+Review vendors
+Report vendors
+Raise disputes
+Contact support/customer care
+VENDOR
 
-* Vendor Registration
-* Vendor Verification
-* Vendor Search
-* Vendor Pagination
-* Vendor Reputation Tracking
-* Dynamic Trust Score Engine
+Vendors can:
 
-## Fraud & Risk Infrastructure
+Register business profile
+Add business details
+Add CAC/NIN/category/description
+View customer reviews
+View reports/disputes
+View trust score
+Upload documents
+Contact support
+ADMIN
 
-* Fraud Reporting System
-* Dispute Management
-* Transaction Monitoring
-* Risk Level Calculation
-* Reputation Monitoring
+Admins can:
 
-## Background Processing
+Verify vendors/documents
+Manage reports
+Manage disputes
+Manage users/vendors
+Handle support tickets
+View audit logs
+Tech Stack
+Node.js
+Express.js
+PostgreSQL
+Prisma ORM
+Redis
+BullMQ
+Socket.IO
+Docker
+GitHub Actions
+Render
+Swagger/OpenAPI
+Jest
+Core Features
+Authentication
+Register
+Login
+Email verification
+JWT access tokens
+Role-based access control
+Vendor System
+Vendor CRUD
+Vendor profile ownership
+Vendor search
+Top-rated vendors
+Vendor trust score
+Vendor documents
+Customer Trust Features
+Reviews
+Fraud reports
+Disputes
+Support tickets
+Admin Features
+Report moderation
+Dispute moderation
+Document verification
+Support ticket management
+Audit logs
+Developer Platform
+API keys
+Webhooks
+Usage tracking
+Subscription plans
+Real-Time System
 
-* BullMQ Queue Workers
-* Redis Queue System
-* Async Trust Score Recalculation
-* Event-Based Processing
+TrustBridge supports real-time events using Socket.IO.
 
-## Webhooks
+Frontend clients can connect and join their user room:
 
-* Trust Score Webhooks
-* Vendor Verification Events
-* Dispute Events
-* Fraud Report Notifications
+import { io } from "socket.io-client";
 
-## Production Infrastructure
+const socket = io(API_URL);
 
-* PostgreSQL Database
-* Prisma ORM
-* Redis Cloud Integration
-* Dockerized Development
-* CI/CD with GitHub Actions
-* Production Deployment on Render
-* Swagger/OpenAPI Documentation
+socket.emit("join", user.id);
 
-## Security
+Supported events:
 
-* Helmet Security
-* Rate Limiting
-* Request Validation
-* Zod Validation
-* Centralized Error Handling
-* Protected API Routes
+notification:new
+support:message
+API Authentication
 
----
+JWT protected routes require:
 
-# Tech Stack
-
-## Backend
-
-* Node.js
-* Express.js
-
-## Database
-
-* PostgreSQL
-* Prisma ORM
-
-## Queue System
-
-* Redis
-* BullMQ
-
-## DevOps & Deployment
-
-* Docker
-* Docker Compose
-* GitHub Actions
-* Render
-
-## Documentation & Testing
-
-* Swagger/OpenAPI
-* Jest
-
----
-
-# Project Architecture
-
-```txt
-src/
-│
-├── config/
-├── controllers/
-├── middlewares/
-├── modules/
-├── routes/
-├── services/
-├── utils/
-├── queues/
-├── workers/
-└── tests/
-```
-
----
-
-# API Authentication
-
-Protected routes require:
-
-```http
 Authorization: Bearer YOUR_ACCESS_TOKEN
-```
 
 API-key protected routes require:
 
-```http
 x-api-key: YOUR_API_KEY
-```
-
----
-
-# Core API Endpoints
-
-# Health
-
-## API Health Check
-
-```http
-GET /api/health
-```
-
----
-
-# Authentication Routes
-
-## Register User
-
-```http
+Main API Endpoints
+Auth
 POST /api/auth/register
-```
-
-### Request Body
-
-```json
-{
-  "fullName": "Leniency Yowika",
-  "email": "lead@example.com",
-  "password": "password123"
-}
-```
-
----
-
-## Login User
-
-```http
 POST /api/auth/login
-```
-
-### Request Body
-
-```json
-{
-  "email": "lead@example.com",
-  "password": "password123"
-}
-```
-
----
-
-## Get Current User
-
-```http
-GET /api/auth/me
-```
-
----
-
-# Vendor Routes
-
-## Create Vendor
-
-```http
-POST /api/vendors
-```
-
-### Request Body
-
-```json
-{
-  "businessName": "LeadTech Ltd",
-  "businessEmail": "info@leadtech.com",
-  "phoneNumber": "+2348012345678",
-  "address": "Lagos, Nigeria",
-  "cacNumber": "RC24689"
-}
-```
-
----
-
-## Get All Vendors
-
-```http
-GET /api/vendors
-```
-
-### Search & Pagination
-
-```http
-GET /api/vendors?search=lead&page=1&limit=10
-```
-
----
-
-## Get Single Vendor
-
-```http
-GET /api/vendors/:id
-```
-
----
-
-## Update Vendor
-
-```http
-PATCH /api/vendors/:id
-```
-
----
-
-## Delete Vendor
-
-```http
+POST /api/auth/verify-email
+POST /api/auth/resend-verification
+GET  /api/auth/me
+Vendors
+POST   /api/vendors
+GET    /api/vendors
+GET    /api/vendors/top-rated
+GET    /api/vendors/search?query=tech
+GET    /api/vendors/me
+PATCH  /api/vendors/me
+GET    /api/vendors/:id
+PATCH  /api/vendors/:id
 DELETE /api/vendors/:id
-```
-
----
-
-## Get Vendor Trust Score
-
-```http
-GET /api/vendors/:id/trust-score
-```
-
-This endpoint automatically:
-
-* recalculates trust score
-* updates vendor reputation
-* emits webhook events
-* triggers background jobs
-
----
-
-# Report Routes
-
-## Create Fraud Report
-
-```http
-POST /api/reports
-```
-
----
-
-## Get All Reports
-
-```http
-GET /api/reports
-```
-
----
-
-# Transaction Routes
-
-## Create Transaction
-
-```http
-POST /api/transactions
-```
-
----
-
-## Get Transactions
-
-```http
-GET /api/transactions
-```
-
----
-
-## Update Transaction Status
-
-```http
+GET    /api/vendors/:id/trust-score
+Reviews
+POST   /api/reviews
+GET    /api/reviews/vendor/:vendorId
+PATCH  /api/reviews/:id
+DELETE /api/reviews/:id
+Reports
+POST   /api/reports
+GET    /api/reports
+GET    /api/reports/:id
+PATCH  /api/reports/:id/status
+DELETE /api/reports/:id
+Transactions
+POST  /api/transactions
+GET   /api/transactions/vendor/:vendorId
+GET   /api/transactions/:id
 PATCH /api/transactions/:id/status
-```
+Disputes
+POST   /api/disputes
+GET    /api/disputes
+GET    /api/disputes/:id
+PATCH  /api/disputes/:id/status
+DELETE /api/disputes/:id
+Documents
+POST   /api/documents/upload
+GET    /api/documents/vendor/:vendorId
+PATCH  /api/documents/:id/verify
+DELETE /api/documents/:id
+Support Tickets
+POST  /api/support/tickets
+GET   /api/support/tickets/my
+GET   /api/support/tickets
+PATCH /api/support/tickets/:id/status
+POST  /api/support/tickets/:id/messages
+Notifications
+POST   /api/notifications
+GET    /api/notifications
+PATCH  /api/notifications/:id/read
+PATCH  /api/notifications/read-all
+DELETE /api/notifications/:id
+Developer/API Keys
+POST   /api/developers/api-keys
+GET    /api/developers/api-keys
+DELETE /api/developers/api-keys/:id
+Billing
+POST /api/billing/subscriptions
+GET  /api/billing/subscriptions/current
+Webhooks
+POST   /api/webhooks
+GET    /api/webhooks
+DELETE /api/webhooks/:id
+Admin
+GET /api/admin/dashboard
+GET /api/admin/audit-logs
+Environment Variables
 
----
+Create a .env file:
 
-# Dispute Routes
-
-## Create Dispute
-
-```http
-POST /api/disputes
-```
-
----
-
-## Get Disputes
-
-```http
-GET /api/disputes
-```
-
----
-
-## Update Dispute Status
-
-```http
-PATCH /api/disputes/:id/status
-```
-
----
-
-# Webhook System
-
-TrustBridge emits webhook events for:
-
-* trust score updates
-* vendor verification updates
-* dispute status changes
-* fraud reports
-* transaction events
-
-Example webhook payload:
-
-```json
-{
-  "event": "trust_score.updated",
-  "payload": {
-    "vendorId": "123456",
-    "businessName": "LeadTech Ltd",
-    "oldScore": 60,
-    "newScore": 72,
-    "riskLevel": "MEDIUM"
-  },
-  "timestamp": "2026-05-10T11:34:22.026Z"
-}
-```
-
-Webhook testing supported with:
-
-```txt
-https://webhook.site
-```
-
----
-
-# Queue System
-
-TrustBridge uses BullMQ + Redis for:
-
-* trust score recalculation
-* background processing
-* async notifications
-* webhook processing
-* event handling
-
-Background jobs implemented for:
-
-* report creation
-* transaction creation
-* transaction status updates
-* dispute creation
-* dispute status updates
-* document verification
-
----
-
-# CI/CD Pipeline
-
-GitHub Actions automatically:
-
-* installs dependencies
-* generates Prisma client
-* runs automated tests
-* validates deployment builds
-
----
-
-# Docker Setup
-
-## Start Development Environment
-
-```bash
-docker compose up --build
-```
-
----
-
-# Environment Variables
-
-Create a `.env` file:
-
-```env
 NODE_ENV=development
-
 PORT=5000
 
-DATABASE_URL=your_postgresql_database_url
-
+DATABASE_URL=your_postgresql_url
 REDIS_URL=your_redis_url
 
 JWT_ACCESS_SECRET=your_access_secret
-
 JWT_REFRESH_SECRET=your_refresh_secret
-
 JWT_ACCESS_EXPIRES_IN=15m
-
 JWT_REFRESH_EXPIRES_IN=7d
 
 CLIENT_URL=http://localhost:5173
-```
 
----
+BREVO_API_KEY=your_brevo_api_key
+BREVO_SENDER_EMAIL=your_sender_email
 
-# Local Development Setup
+SKIP_EMAIL=true
+Local Development
 
-## Clone Repository
+Install dependencies:
 
-```bash
-git clone https://github.com/Lyowika7/trustbridge-api.git
-cd trustbridge-api
-```
-
----
-
-## Install Dependencies
-
-```bash
 npm install
-```
 
----
+Generate Prisma client:
 
-## Generate Prisma Client
-
-```bash
 npx prisma generate
-```
 
----
+Run migrations:
 
-## Run Database Migrations
-
-```bash
 npx prisma migrate dev
-```
 
----
+Start development server:
 
-## Start Development Server
-
-```bash
 npm run dev
-```
+Docker Development
+docker compose up --build
 
----
+Restart API container:
 
-# Running Tests
-
-```bash
+docker compose restart api
+Tests
 npm test
-```
 
----
+Current test coverage includes:
 
-# Deployment
+Health endpoint
+Auth flow
+Platform endpoint integration tests
+Vendor profile flow
+Reviews
+Reports
+Transactions
+Disputes
+Documents
+Support tickets
+CI/CD
 
-TrustBridge is deployed on Render with:
+GitHub Actions automatically runs:
 
-* PostgreSQL production database
-* Redis Cloud production instance
-* CI/CD pipeline
-* production environment variables
-* automated deployment
+dependency installation
+Prisma generate
+migrations
+API startup
+automated tests
+Deployment
 
----
+TrustBridge is deployed on Render using:
 
-# Production Infrastructure
+Render Web Service
+Render PostgreSQL
+Redis Cloud
+GitHub Actions CI/CD
+Architecture Highlights
+Modular Express architecture
+Prisma database modeling
+Role-based access control
+Redis caching
+BullMQ queues
+Socket.IO real-time events
+Webhook dispatching
+Swagger API docs
+Automated tests
+Production deployment
+Future Improvements
+Cloudinary/S3 uploads
+Payment integration
+Advanced analytics dashboard
+Admin user management
+AI fraud detection
+Multi-tenant organizations
+SDK generation
+Author
 
-## Services Used
+Leniency Yowika
 
-### Backend Hosting
+GitHub:
 
-* Render
-
-### Database
-
-* PostgreSQL
-
-### Queue Infrastructure
-
-* Redis Cloud
-
-### CI/CD
-
-* GitHub Actions
-
----
-
-# Security Features
-
-* JWT Authentication
-* Access & Refresh Tokens
-* Role-Based Authorization
-* API Key Security
-* Request Validation
-* Rate Limiting
-* Helmet Protection
-* Secure Environment Variables
-* Protected Routes
-
----
-
-# Architecture Highlights
-
-* Modular Backend Architecture
-* Event-Driven Design
-* Queue-Based Processing
-* Production Redis Integration
-* Webhook Infrastructure
-* Dockerized Development
-* Scalable REST API
-* Production CI/CD Pipeline
-* Background Workers
-* Async Event Processing
-
----
-
-# Future Improvements
-
-* Frontend Dashboard
-* Analytics Dashboard
-* API Usage Metering
-* Subscription Billing
-* Admin Moderation Panel
-* Cloudinary/S3 Uploads
-* AI Fraud Detection
-* Multi-Tenant Support
-* Advanced Risk Engine
-* Real-Time Monitoring
-
----
-
-# Why TrustBridge?
-
-Most businesses lack:
-
-* trust infrastructure
-* fraud systems
-* vendor verification
-* reputation tracking
-* risk scoring systems
-
-TrustBridge solves this by providing a scalable API platform for:
-
-* trust scoring
-* vendor verification
-* fraud monitoring
-* dispute handling
-* webhook integrations
-
----
-
-# Author
-
-## Leniency Yowika
-
-### GitHub
-
-```txt
 https://github.com/Lyowika7
-```
 
-### LinkedIn
+LinkedIn:
 
-```txt
 https://www.linkedin.com/in/leniency-yowika
-```
-
----
-
-# License
+License
 
 MIT License
-
-Copyright (c) 2026 Leniency Yowika
-
-```
-```

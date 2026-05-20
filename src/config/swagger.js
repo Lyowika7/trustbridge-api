@@ -1,12 +1,15 @@
-import swaggerJsdoc from "swagger-jsdoc";
+import { swaggerSpec, swaggerUi } from "../docs/swaggerDocs.js";
 
-import swaggerDocs from "../docs/swaggerDocs.js";
+const swaggerSetup = (app) => {
+  app.get("/api/docs.json", (req, res) => {
+    res.status(200).json(swaggerSpec);
+  });
 
-const swaggerOptions = {
-  definition: swaggerDocs,
-  apis: []
+  app.use(
+    "/api/docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec)
+  );
 };
 
-const swaggerSpec = swaggerJsdoc(swaggerOptions);
-
-export default swaggerSpec;
+export default swaggerSetup;
